@@ -1,5 +1,7 @@
-"""AWG LUT Generator entry point."""
+"""Entry point for the AWG LUT Generator application."""
+
 from gui.main_window import run
+
 
 if __name__ == "__main__":
     run()

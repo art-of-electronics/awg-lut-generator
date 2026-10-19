@@ -37,6 +37,14 @@ def generate_waveform(name: str, samples: int, replicate: int = 1,
             period = np.exp(-((xpos - 0.5) / parameter) ** 2)
         case "exponential":
             period = np.exp(-xpos / parameter)
+    if name.lower() in {"gaussian", "exponential"}:
+        minimum = np.min(period)
+        maximum = np.max(period)
+        amplitude = maximum - minimum
+        if amplitude > 0.0:
+            period = (period - minimum) / amplitude
+        else:
+            period = np.zeros_like(period)
     if name.lower() in {"sine", "wave"}:
         param_suffix = ""
     return np.tile(period, replicate), suffix, param_suffix

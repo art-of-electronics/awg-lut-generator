@@ -57,8 +57,8 @@ class AWGApplication:
         self.carrier_div_menu.grid(row=3, column=3, columnspan=3, sticky='nesw')
         self.carrier_div_menu["background"] = 'light gray'
         self.carrier_div_menu["state"] = 'disabled'
-
         #----
+        
         self.function = tk.StringVar()
         self.function.set(OPERATIONS[0]) #Default value
         self.function_menu = tk.OptionMenu(self.tk, self.function, *OPERATIONS)
@@ -167,8 +167,7 @@ class AWGApplication:
 
 
     def _register_callbacks(self) -> None:
-        for variable in (self.envelope, self.carrier, self.carrier_div,
-                         self.function, self.samples, self.header):
+        for variable in (self.envelope, self.carrier, self.carrier_div, self.function, self.samples, self.header):
             variable.trace_add('write', self.on_change)
 
     def _update_waveform_controls(self, name: str, is_envelope: bool) -> None:
@@ -230,8 +229,7 @@ class AWGApplication:
 
     def export(self) -> None:
         if self.signal is not None:
-            export_lut(self.signal, self.filename, self.header.get(),
-                       self.output_dir, self.headers_dir)
+            export_lut(self.signal, self.filename, self.header.get(), self.output_dir, self.headers_dir)
 
     def exit(self) -> None:
         self.tk.quit()

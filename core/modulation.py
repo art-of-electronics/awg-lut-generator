@@ -1,5 +1,13 @@
-"""Legacy-compatible signal combination. Normalization intentionally unchanged."""
+"""Combine AWG waveforms and scale their peak magnitude to 1."""
 import numpy as np
+
+
+def normalize(signal: np.ndarray) -> np.ndarray:
+    """Preserve signal polarity and shape; scale only nonzero signals."""
+    peak = np.max(np.abs(signal))
+    if peak > 0.0:
+        return signal / peak
+    return signal.copy()
 
 
 def combine(operation: str, envelope: np.ndarray | None,
@@ -9,21 +17,17 @@ def combine(operation: str, envelope: np.ndarray | None,
             lhs = 1 if envelope is None else envelope
             rhs = 1 if carrier is None else carrier
             output = lhs * rhs
-            output = output / max(output)
             suffix = "_x"
         case "add":
             lhs = 0 if envelope is None else envelope
             rhs = 0 if carrier is None else carrier
             output = lhs + rhs
-            output = output / max(output)
             suffix = "_+"
         case "subtract":
             lhs = 0 if envelope is None else envelope
             rhs = 0 if carrier is None else carrier
             output = lhs - rhs
-            if np.any(output):
-                output = output / max(output)
             suffix = "_-"
         case _:
             raise ValueError(f"Unknown operation: {operation}")
-    return output, suffix
+    return normalize(np.asarray(output)), suffix

@@ -1,12 +1,17 @@
-"""Legacy-compatible AWG CSV export."""
+"""AWG CSV export using the Python standard library."""
+
+import csv
 from pathlib import Path
+
 import numpy as np
-import pandas as pd
 
 
 def discover_headers(directory: Path) -> list[str]:
-    return ["RAW"] + [file.stem.removeprefix("Header_") for file in directory.iterdir()
-                      if file.is_file() and file.suffix == ".csv" and file.stem.startswith("Header_")]
+    return ["RAW"] + [
+        file.stem.removeprefix("Header_")
+        for file in directory.iterdir()
+        if file.is_file() and file.suffix == ".csv" and file.stem.startswith("Header_")
+    ]
 
 
 def export_lut(signal: np.ndarray, filename: str, header: str,
@@ -14,11 +19,26 @@ def export_lut(signal: np.ndarray, filename: str, header: str,
     destination = output_dir / header
     destination.mkdir(parents=True, exist_ok=True)
     output = destination / filename
-    if header != "RAW":
-        source = pd.read_csv(headers_dir / f"Header_{header}.csv", skip_blank_lines=False, header=None)
-        lines = source[0] + "," + source[1]
-        lines.to_csv(output, mode="w", sep=",", encoding="utf-8", index=False, header=None, na_rep=None)
-    data = pd.DataFrame(data=signal)
-    data.index += 1
-    data.to_csv(output, mode="a+", sep=",", encoding="utf-8", header=False, float_format="%.6f")
+
+    with output.open("w", encoding="utf-8", newline="") as target:
+        writer = csv.writer(target, lineterminator="\n")
+
+        if header != "RAW":
+            header_path = headers_dir / f"Header_{header}.csv"
+            with header_path.open("r", encoding="utf-8", newline="") as source:
+                reader = csv.reader(source)
+                for row in reader:
+                    # The legacy Pandas exporter wrote each header row as
+                    # one quoted CSV field (including empty header rows).
+                    if len(row) >= 2:
+                        value = f"{row[0]},{row[1]}"
+                    elif len(row) == 1:
+                        value = row[0]
+                    else:
+                        value = ""
+                    target.write('"' + value.replace('"', '""') + '"\n')
+
+        for index, value in enumerate(signal, start=1):
+            writer.writerow((index, f"{float(value):.6f}"))
+
     return output

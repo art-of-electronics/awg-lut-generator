@@ -39,7 +39,7 @@ class AWGApplication:
         self.colortab = COLOR_TABLE
         self.project_dir = Path(__file__).resolve().parents[1]
         self.headers_dir = self.project_dir / 'headers'
-        self.output_dir = Path.cwd()
+        self.output_dir = self.project_dir / 'output'
         self.headers = discover_headers(self.headers_dir)
         self.signal: np.ndarray | None = None
         self.filename = ''

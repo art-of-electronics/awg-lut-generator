@@ -136,4 +136,3 @@ def export_lut(
             writer.writerow((index, f"{float(value):.6f}"))
 
     return output
-    

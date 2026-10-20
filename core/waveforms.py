@@ -119,4 +119,3 @@ def generate_waveform(
         param_suffix = ""
 
     return np.tile(period, replicate), suffix, param_suffix
-    

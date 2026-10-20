@@ -72,4 +72,3 @@ def combine(
             raise ValueError(f"Unknown operation: {operation}")
 
     return normalize(np.asarray(output)), suffix
-    
